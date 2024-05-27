@@ -86,10 +86,10 @@ HREA rasters and metadata are stored in sub-directories below the top-level HREA
 + HREAv1.1\_COGs/*country\_iso3*/*country\_iso3*/*cog\_id*\_set\_lightscore\_*year*.tif: Predicted likelihood that a settlement is electrified (0 to 1).
 + HREAv1.1\_COGs/*country\_iso3*/*country\_iso3*/*cog\_id*\_set\_prplit\_*year*.tif: Proportion of nights a settlement is statistically brighter than matched uninhabited areas.
 
-One can obtain HREA COGs from AWS either by direct download using the object URLs or through the AWS command line interface (CLI).  Using the CLI, one can list the contents of a directory with `aws s3 ls s3://globalnightlight/path/to/dir`.  For the top-level directory, one would run:
+One can obtain HREA COGs from AWS either by direct download using the object URLs or through the AWS command line interface (CLI).  Using the CLI, one can list the contents of a directory with `aws s3 ls s3://globalnightlight/path/to/dir`.  With the AWS CLI, one must use the `--no-sign-request` flag.  To list the contents of the top-level HREA directory, one would run:
 
 ```
-aws s3 ls s3://globalnightlight/HREAv1.1_COGs
+aws s3 ls s3://globalnightlight/HREAv1.1_COGs --no-sign-request
 ```
 
 The root HREA STAC catalog, which lists links to all *country\_iso3* catalogs, can be downloaded with a tools like `wget`, `curl`, or `aws-cli`:
@@ -99,13 +99,13 @@ wget https://globalnightlight.s3.amazonaws.com/HREAv1.1_COGs/catalog.json
 
 curl -O https://globalnightlight.s3.amazonaws.com/HREAv1.1_COGs/catalog.json
 
-aws s3 cp s3://globalnightlight/HREAv1.1_COGs/catalog.json .
+aws s3 cp s3://globalnightlight/HREAv1.1_COGs/catalog.json . --no-sign-request
 ```
 
 One can find the *cog\_id*s belonging to a specific *country\_iso3* by checking the [lookup table](https://globalnightlight.s3.amazonaws.com/HREA_aux_data/HREA_place_lookup.csv) or listing the contents in the folder with:
 
 ```
-aws s3 ls s3://globalnightlight/HREAv1.1_COGs/${country_iso3}
+aws s3 ls s3://globalnightlight/HREAv1.1_COGs/${country_iso3} --no-sign-request
 ```
 
 One could read a specific *country\_iso3*'s catalog to determine linked catalogs and collections:
@@ -114,11 +114,19 @@ One could read a specific *country\_iso3*'s catalog to determine linked catalogs
 curl https://globalnightlight.s3.amazonaws.com/HREAv1.1_COGs/${country_iso3}/catalog.json
 ```
 
-Individual assets can be downloaded using the path structure described above.  As an example, one could obtain the mean standardized residuals for Ghana settlements in 2020 with:
+Individual assets can be downloaded using the path structure described above.  As an example, one could obtain the mean standardized residuals (*z*-scores) for Ghanaian settlements in 2020 with:
 
 ```
-aws s3 cp s3://globalnightlight/HREAv1.1_COGs/GHA/GHA/set_zscore/GHA_set_zscore_2020.tif .
+aws s3 cp s3://globalnightlight/HREAv1.1_COGs/GHA/GHA/set_zscore/GHA_set_zscore_2020.tif . --no-sign-request
 ```
+
+Alternatively, one can download the contents of an entire directory for some *country\_iso3* to some directory `/path/to/dir/` like so:
+
+```
+aws s3 cp s3://globalnightlight/HREAv1.1_COGs/${country_iso3}/ /path/to/dir/ --recursive --no-sign-request
+```
+
+For an example of how one could traverse the HREA STAC and download items in R, please see [R/download_HREA_COGs.R](../blob/master/R/download_HREA_COGs.R).
 
 
 ## How to Cite
